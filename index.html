@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khoury Design · Chalet K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══ TOKENS ═══════════════════════════════════════════════════════════ */
+:root {
+  --bg:      #09090f;
+  --s1:      #0e0f18;
+  --s2:      #131422;
+  --s3:      #191a2a;
+  --s4:      #1f2030;
+
+  --rule:    rgba(255,255,255,0.055);
+  --rule2:   rgba(255,255,255,0.10);
+  --rule3:   rgba(255,255,255,0.18);
+
+  --cream:   #ede8dc;
+  --sand:    #9a9282;
+  --dust:    #60594f;
+  --mute:    #38342e;
+
+  --gold:        #c4a25a;
+  --gold-soft:   rgba(196,162,90,0.08);
+  --gold-line:   rgba(196,162,90,0.22);
+  --gold-hi:     #d4b870;
+
+  --g:    #2a6845; --g-s: rgba(42,104,69,.09);  --g-l: rgba(42,104,69,.28);
+  --ov:   #476820; --ov-s:rgba(71,104,32,.09);  --ov-l:rgba(71,104,32,.28);
+  --am:   #7a5818; --am-s:rgba(122,88,24,.09);  --am-l:rgba(122,88,24,.28);
+  --rd:   #682828; --rd-s:rgba(104,40,40,.08);  --rd-l:rgba(104,40,40,.24);
+  --bl:   #284878; --bl-s:rgba(40,72,120,.09);  --bl-l:rgba(40,72,120,.28);
+  --tl:   #1a5060; --tl-s:rgba(26,80,96,.09);   --tl-l:rgba(26,80,96,.28);
+  --ed:   #4a3078; --ed-s:rgba(74,48,120,.09);  --ed-l:rgba(74,48,120,.28);
+
+  --serif: 'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
+  --sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --gut:   2.4rem;
+}
+
+/* ═══ RESET ═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ LOADER ═══════════════════════════════════════════════════════════ */
+#loader {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.4rem;
+  background: var(--bg); z-index: 999;
+  transition: opacity .4s, visibility .4s;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+#loader .mark { animation: breathe 2.4s ease-in-out infinite; }
+#loader .loading-text {
+  font-family: var(--sans); font-size: 9px; font-weight: 400;
+  letter-spacing: .28em; text-transform: uppercase; color: var(--dust);
+}
+@keyframes breathe { 0%,100%{opacity:.3} 50%{opacity:.9} }
+
+/* ═══ APP ═══════════════════════════════════════════════════════════════ */
+#app { opacity: 0; transition: opacity .5s .1s; }
+#app.ready { opacity: 1; }
+
+/* ═══ HEADER ════════════════════════════════════════════════════════════ */
+.hdr {
+  background: var(--s1);
+  border-bottom: 1px solid var(--rule);
+  position: sticky; top: 0; z-index: 80;
+  transition: border-color .2s;
+}
+body.edit-mode .hdr { border-bottom-color: var(--ed-l); }
+body.client-mode .hdr { border-bottom-color: rgba(196,162,90,.15); }
+
+.hdr-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem var(--gut) .7rem;
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap; gap: .6rem;
+}
+.hdr-brand {
+  display: flex; align-items: center; gap: .7rem;
+  font-family: var(--sans); font-size: 9px; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--sand);
+}
+.hdr-brand .divider { color: var(--mute); }
+.hdr-brand .project { color: var(--cream); }
+.hdr-badges { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.mode-badge {
+  font-family: var(--sans); font-size: 9px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 2px;
+}
+.mode-badge.edit { background: var(--ed-s); border: 1px solid var(--ed-l); color: #b8a0e0; }
+.mode-badge.client { background: var(--gold-soft); border: 1px solid var(--gold-line); color: var(--gold); }
+.sync-dot {
+  font-family: var(--sans); font-size: 9px; font-weight: 400;
+  letter-spacing: .12em; color: var(--dust);
+  display: flex; align-items: center; gap: 5px;
+}
+.sync-dot::before {
+  content: ''; display: block; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--dust);
+}
+.sync-dot.saved::before { background: var(--g); }
+.sync-dot.saving::before { background: var(--gold); animation: breathe .8s ease-in-out infinite; }
+.sync-dot.error::before { background: var(--rd); }
+.sync-dot.local::before { background: var(--dust); }
+
+.hdr-identity {
+  padding: 1.4rem var(--gut) 1rem;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem;
+  flex-wrap: wrap;
+}
+.hdr-title-block {}
+.hdr-eyebrow {
+  font-family: var(--sans); font-size: 9px; font-weight: 400;
+  letter-spacing: .24em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: .35rem;
+}
+.hdr-title {
+  font-family: var(--serif); font-size: clamp(26px,3.5vw,40px);
+  font-weight: 300; line-height: 1.1; letter-spacing: .01em; color: var(--cream);
+}
+.hdr-title em { font-style: italic; font-weight: 300; }
+.hdr-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* ═══ BUTTONS ═══════════════════════════════════════════════════════════ */
+.btn {
+  font-family: var(--sans); font-size: 10px; font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 2px;
+  border: 1px solid var(--rule2); background: transparent;
+  color: var(--sand); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.btn:hover { background: var(--s3); color: var(--cream); border-color: var(--rule3); }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: #1a1200; font-weight: 500; }
+.btn.primary:hover { background: var(--gold-hi); }
+.btn.edit-on { background: var(--ed-s); border-color: var(--ed-l); color: #c0aaee; }
+.btn.client-on { background: var(--gold-soft); border-color: var(--gold-line); color: var(--gold); }
+.btn.pay-on { background: var(--gold-soft); border-color: var(--gold-line); color: var(--gold); }
+.btn.price-on { background: var(--bl-s); border-color: var(--bl-l); color: #88aadd; }
+.btn.danger { background: var(--rd-s); border-color: var(--rd-l); color: #cc8888; }
+.btn.danger:hover { background: rgba(104,40,40,.2); }
+.btn.ghost { border-style: dashed; color: var(--dust); border-color: var(--rule); }
+.btn.ghost:hover { border-color: var(--rule2); color: var(--sand); }
+.btn.edit-only { display: none; }
+body.edit-mode .btn.edit-only { display: inline-block; }
+
+/* ═══ METRICS STRIP ═════════════════════════════════════════════════════ */
+.metrics-strip {
+  display: flex; align-items: stretch;
+  border-top: 1px solid var(--rule);
+  overflow-x: auto;
+}
+.metric-cell {
+  flex: 1; min-width: 120px;
+  padding: 1rem var(--gut);
+  border-right: 1px solid var(--rule);
+  display: flex; flex-direction: column; gap: .25rem;
+}
+.metric-cell:last-child { border-right: none; }
+.metric-num {
+  font-family: var(--serif); font-size: 32px; font-weight: 300;
+  line-height: 1; letter-spacing: -.01em; color: var(--cream);
+}
+.metric-num.gold { color: var(--gold); }
+.metric-num.green { color: #4aaa74; }
+.metric-num.small {
+  font-size: 14px; font-family: var(--sans); font-weight: 300;
+  letter-spacing: .01em; padding-top: 4px; color: #5bbdd0; line-height: 1.4;
+}
+.metric-label {
+  font-family: var(--sans); font-size: 9px; font-weight: 400;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--dust);
+}
+.metric-sub {
+  font-family: var(--sans); font-size: 10px; color: var(--dust); line-height: 1.35;
+}
+
+/* ═══ MAIN ═══════════════════════════════════════════════════════════════ */
+.main { padding: 1.8rem var(--gut) 4rem; max-width: 1440px; margin: 0 auto; }
+
+/* ═══ PANELS ═════════════════════════════════════════════════════════════ */
+.panel {
+  border-radius: 3px; padding: 1.4rem 1.6rem; margin-bottom: 1.4rem;
+  border: 1px solid var(--rule);
+}
+.panel.pay { border-color: var(--gold-line); background: linear-gradient(135deg, var(--s2), var(--s1)); }
+.panel.price { border-color: var(--bl-l); background: var(--s1); }
+.panel-label {
+  font-family: var(--sans); font-size: 9px; font-weight: 400;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--dust); margin-bottom: 1.1rem;
+}
+.panel-internal-note {
+  font-family: var(--sans); font-size: 11px; color: var(--dust);
+  font-style: italic; margin-bottom: 1rem; line-height: 1.5;
+}
+
+/* Payment grid */
+.pay-cells { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+.pay-cell {
+  flex: 1; min-width: 140px;
+  background: var(--s2); border: 1px solid var(--rule); border-radius: 2px;
+  padding: .9rem 1rem;
+}
+.pay-cell-label { font-family: var(--sans); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--dust); margin-bottom: .3rem; }
+.pay-cell-val { font-family: var(--serif); font-size: 20px; font-weight: 400; color: var(--cream); }
+.pay-cell-val.gold { color: var(--gold); }
+.pay-cell-val.green { color: #4aaa74; }
+.pay-input { font-family: var(--serif); font-size: 18px; background: var(--s3); border: 1px solid var(--ed-l); border-radius: 2px; color: var(--cream); padding: 2px 7px; width: 145px; outline: none; }
+.pay-input:focus { border-color: var(--ed); }
+.pay-note { font-family: var(--sans); font-size: 11px; color: var(--sand); line-height: 1.6; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.pay-note strong { color: var(--cream); font-weight: 400; }
+
+/* Pricing table */
+.price-tbl { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 12px; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+.price-tbl th { background: var(--s2); color: var(--dust); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); font-weight: 400; }
+.price-tbl th:not(:first-child) { text-align: right; }
+.price-tbl td { padding: 10px 12px; border-bottom: 1px solid var(--rule); color: var(--sand); vertical-align: middle; }
+.price-tbl tr:last-child td { border-bottom: none; }
+.price-tbl td:not(:first-child) { text-align: right; }
+.price-tbl td.cat { color: var(--cream); }
+.rate-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.rate-in { font-family: var(--sans); font-size: 12px; background: var(--s2); border: 1px solid var(--rule2); border-radius: 2px; color: var(--cream); padding: 4px 7px; width: 68px; text-align: right; outline: none; }
+.rate-in:focus { border-color: var(--gold); }
+.cnt-in { font-family: var(--sans); font-size: 12px; background: var(--s2); border: 1px solid var(--rule2); border-radius: 2px; color: var(--cream); padding: 4px 7px; width: 52px; text-align: right; outline: none; }
+.cnt-in:focus { border-color: var(--gold); }
+.price-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--rule); flex-wrap: wrap; gap: 1rem; }
+.price-footer-note { font-family: var(--sans); font-size: 11px; color: var(--sand); max-width: 520px; line-height: 1.6; }
+.price-footer-note strong { color: var(--cream); font-weight: 400; }
+.price-total { font-family: var(--serif); font-size: 30px; font-weight: 300; color: var(--gold); white-space: nowrap; }
+
+/* ═══ FILTER BAR ══════════════════════════════════════════════════════ */
+.filter-bar { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 1.4rem; align-items: center; }
+.filter-lbl { font-family: var(--sans); font-size: 11px; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(--dust); margin-right: 5px; }
+.fbtn { font-family: var(--sans); font-size: 12px; font-weight: 300; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--rule); background: transparent; color: var(--sand); cursor: pointer; transition: all .15s; letter-spacing: .04em; }
+.fbtn:hover { border-color: var(--rule2); color: var(--cream); }
+.fbtn.on { background: var(--cream); color: var(--bg); border-color: var(--cream); font-weight: 400; }
+.fbtn.fd.on { background: var(--g); border-color: var(--g); color: #d0ffe8; }
+.fbtn.fo.on { background: var(--ov); border-color: var(--ov); color: #d8f0a8; }
+.fbtn.fp.on { background: var(--am); border-color: var(--am); color: #f0d8a0; }
+.fbtn.fm.on { background: var(--rd); border-color: var(--rd); color: #f0c0c0; }
+.fbtn.fe.on { background: var(--bl); border-color: var(--bl); color: #c0d4f8; }
+
+/* ═══ LEGEND ══════════════════════════════════════════════════════════ */
+.legend { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-bottom: 1.4rem; align-items: center; }
+.leg { display: flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 12px; color: var(--dust); letter-spacing: .04em; }
+.leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ═══ FLOOR SECTIONS ══════════════════════════════════════════════════ */
+.floor { margin-bottom: 2.2rem; }
+.floor-hdr { display: flex; align-items: center; gap: 1rem; margin-bottom: .9rem; }
+.floor-name {
+  font-family: var(--serif); font-size: 22px; font-weight: 400;
+  letter-spacing: .04em; color: var(--cream);
+  letter-spacing: .2em; text-transform: uppercase; color: var(--dust); white-space: nowrap;
+}
+.floor-rule { flex: 1; height: 1px; background: var(--rule); }
+.floor-tally { font-family: var(--sans); font-size: 12px; color: var(--dust); white-space: nowrap; letter-spacing: .06em; }
+.floor-acts { display: flex; gap: 5px; }
+
+/* ═══ CARDS ════════════════════════════════════════════════════════════ */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(218px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; grid-auto-rows: 1fr; }
+.card {
+  background: var(--s1); padding: 1.1rem 1.2rem;
+  display: grid;
+  grid-template-rows: auto auto auto auto 1px auto;
+  gap: .7rem;
+  transition: background .15s; position: relative;
+  border-left: 3px solid transparent;
+}
+.card:hover { background: var(--s2); }
+body.edit-mode .card { cursor: grab; }
+body.edit-mode .card:active { cursor: grabbing; }
+.card.dragging { opacity: 0.18; pointer-events: none; }
+.cards.drag-over {
+  outline: 1px dashed var(--gold-line);
+  background: linear-gradient(var(--gold-soft), var(--gold-soft));
+}
+.cards.drag-over .card { opacity: 0.6; }
+.card.st-done { border-left-color: var(--g); }
+.card.st-over { border-left-color: var(--ov); }
+.card.st-partial { border-left-color: var(--am); }
+.card.st-missing { border-left-color: var(--rd); }
+.card.st-extra { border-left-color: var(--bl); }
+
+.card-hdr { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+.card-name { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--cream); line-height: 1.3; flex: 1; }
+.card-edit-btn {
+  font-family: var(--sans); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 1px; border: 1px solid var(--ed-l);
+  background: var(--ed-s); color: #b0a0d8; cursor: pointer; transition: all .15s;
+  white-space: nowrap; flex-shrink: 0; display: none;
+}
+.card-edit-btn:hover { background: var(--ed); color: #e0d8ff; }
+body.edit-mode .card-edit-btn { display: block; }
+
+.status-pill {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--sans); font-size: 9px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase;
+}
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sp-done .dot { background: var(--g); } .sp-done { color: #80ccaa; }
+.sp-over .dot { background: var(--ov); } .sp-over { color: #a8cc70; }
+.sp-partial .dot { background: var(--am); } .sp-partial { color: #ccaa60; }
+.sp-missing .dot { background: var(--rd); } .sp-missing { color: #cc8888; }
+.sp-extra .dot { background: var(--bl); } .sp-extra { color: #88aadd; }
+
+.card-num {
+  font-family: var(--serif); font-size: 38px; font-weight: 300;
+  line-height: 1; color: var(--cream); letter-spacing: -.01em;
+}
+.card-num.zero { color: var(--dust); }
+.card-unit { font-family: var(--sans); font-size: 13px; color: var(--dust); margin-left: 3px; font-weight: 300; }
+.card-vs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: .15rem; }
+.vs-text { font-family: var(--sans); font-size: 12px; color: var(--dust); }
+.vs-tag { font-family: var(--sans); font-size: 11px; padding: 2px 8px; border-radius: 10px; letter-spacing: .04em; }
+.vs-over  { background: var(--ov-s); border: 1px solid var(--ov-l); color: #b0d070; }
+.vs-under { background: var(--rd-s); border: 1px solid var(--rd-l); color: #cc8888; }
+.vs-exact { background: var(--g-s);  border: 1px solid var(--g-l);  color: #80ccaa; }
+.vs-recon { font-family: var(--sans); font-size: 11px; color: var(--dust); letter-spacing: .06em; font-style: italic; }
+
+.card-bar { height: 1px; background: var(--rule); overflow: hidden; }
+.card-bar-fill { height: 100%; }
+.bar-done { background: var(--g); } .bar-over { background: var(--ov); }
+.bar-partial { background: var(--am); } .bar-missing { background: transparent; }
+.bar-extra { background: var(--bl); }
+
+.card-src { font-family: var(--sans); font-size: 12px; color: var(--dust); line-height: 1.4; align-self: end; }
+.card-note-wrap { border-top: 1px solid var(--rule); padding-top: .5rem; margin-top: .3rem; }
+body.client-mode .card-note-wrap { display: none; }
+.card-note {
+  font-family: var(--sans); font-size: 10px; background: transparent; border: none;
+  border-bottom: 1px dashed var(--rule2); color: var(--sand); width: 100%; padding: 3px 0;
+  outline: none; transition: border-color .15s;
+}
+.card-note:focus { border-color: var(--gold); }
+.card-note::placeholder { color: var(--mute); }
+
+/* ═══ INFRA CARDS ═════════════════════════════════════════════════════ */
+.infra-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--tl-l); border: 1px solid var(--tl-l); border-radius: 3px; overflow: hidden; }
+.infra-card {
+  background: var(--s1); padding: 1.1rem 1.2rem;
+  display: flex; flex-direction: column; gap: .6rem;
+  transition: background .15s;
+}
+.infra-card:hover { background: var(--s2); }
+.infra-card-hdr { display: flex; justify-content: space-between; align-items: flex-start; gap: .6rem; }
+.infra-card-name { font-family: var(--serif); font-size: 14px; font-weight: 400; color: var(--cream); line-height: 1.3; }
+.infra-badge { font-family: var(--sans); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 1px; background: var(--tl-s); border: 1px solid var(--tl-l); color: #70bbc8; white-space: nowrap; flex-shrink: 0; }
+.infra-edit-btn { font-family: var(--sans); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 1px; border: 1px solid var(--ed-l); background: var(--ed-s); color: #b0a0d8; cursor: pointer; transition: all .15s; display: none; }
+.infra-edit-btn:hover { background: var(--ed); color: #e0d8ff; }
+body.edit-mode .infra-edit-btn { display: block; }
+.infra-desc { font-family: var(--sans); font-size: 11px; color: var(--dust); line-height: 1.5; }
+.infra-status { font-family: var(--sans); font-size: 9px; color: var(--tl); letter-spacing: .08em; border-top: 1px solid var(--rule); padding-top: .5rem; display: flex; align-items: center; gap: 5px; }
+.infra-status::before { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--tl); flex-shrink: 0; }
+
+/* ═══ SUMMARY & NEXT STEP ═════════════════════════════════════════════ */
+.summary { border: 1px solid var(--rule); border-radius: 3px; padding: 1.4rem 1.6rem; margin-top: 1.8rem; }
+.summary-label { font-family: var(--sans); font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--dust); margin-bottom: .9rem; }
+.summary-text { font-family: var(--sans); font-size: 12px; color: var(--sand); line-height: 1.8; }
+.summary-text strong { color: var(--cream); font-weight: 400; }
+.summary-text .highlight { color: var(--gold); }
+
+.next-box { border: 1px solid var(--gold-line); border-radius: 3px; padding: 1.1rem 1.4rem; margin-top: .9rem; display: flex; gap: 1.2rem; align-items: flex-start; background: var(--gold-soft); }
+.next-label { font-family: var(--sans); font-size: 9px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); white-space: nowrap; padding-top: 2px; flex-shrink: 0; }
+.next-text { font-family: var(--sans); font-size: 11px; color: var(--sand); line-height: 1.65; }
+.next-text strong { color: var(--cream); font-weight: 500; }
+
+/* ═══ SECTION SEPARATORS ═════════════════════════════════════════════ */
+.section-gap { margin-bottom: 2rem; }
+.add-section { display: none; justify-content: center; margin: .5rem 0 1.5rem; }
+body.edit-mode .add-section { display: flex; }
+
+/* ═══ MODAL ═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(9,9,15,.88); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+.modal {
+  background: var(--s2); border: 1px solid var(--rule2); border-radius: 4px;
+  width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column;
+}
+.modal-hdr { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.2rem; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.modal-title { font-family: var(--serif); font-size: 18px; font-weight: 400; color: var(--cream); }
+.modal-x { font-size: 22px; background: none; border: none; color: var(--dust); cursor: pointer; padding: 0 4px; line-height: 1; transition: color .15s; }
+.modal-x:hover { color: var(--cream); }
+.modal-body { padding: 1.2rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: .9rem; }
+.modal-footer { display: flex; gap: 7px; padding: .9rem 1.2rem; border-top: 1px solid var(--rule); flex-shrink: 0; }
+.modal-footer .spacer { flex: 1; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-label { font-family: var(--sans); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--dust); }
+.form-in { font-family: var(--sans); font-size: 13px; background: var(--s3); border: 1px solid var(--rule2); border-radius: 2px; color: var(--cream); padding: 8px 10px; outline: none; width: 100%; transition: border-color .15s; }
+.form-in:focus { border-color: var(--ed); }
+textarea.form-in { resize: vertical; min-height: 72px; font-size: 12px; line-height: 1.5; }
+select.form-in { cursor: pointer; }
+.form-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.form-hint { font-family: var(--sans); font-size: 9px; color: var(--dust); letter-spacing: .04em; }
+
+/* ═══ INTERNAL ONLY ════════════════════════════════════════════════════ */
+.internal { }
+body.client-mode .internal { display: none !important; }
+body.edit-mode .edit-show { display: flex !important; }
+body:not(.edit-mode) .edit-show { display: none !important; }
+
+/* ═══ RESPONSIVE ══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  :root { --gut: 1.4rem; }
+  .hdr-title { font-size: 26px; }
+  .metrics-strip { flex-wrap: wrap; }
+  .metric-cell { min-width: 140px; flex: 1 0 140px; }
+}
+@media (max-width: 600px) {
+  :root { --gut: 1.1rem; }
+  .hdr-title { font-size: 22px; }
+  .metric-num { font-size: 26px; }
+  .card-num { font-size: 30px; }
+}
+
+/* ═══ PRINT ══════════════════════════════════════════════════════════ */
+@media print {
+  body { background: #fff; color: #111; }
+  .hdr { position: static; background: #fff; border-bottom: 1px solid #ddd; }
+  .hdr-top { border-bottom: 1px solid #ddd; }
+  .hdr-actions, .card-edit-btn, .infra-edit-btn, .card-note-wrap, .filter-bar, .add-section, .modal-overlay, .panel.price, #loader { display: none !important; }
+  .card, .infra-card { break-inside: avoid; background: #fff; border-left: 3px solid #ddd; }
+  .card-name, .card-num, .hdr-title, .infra-card-name { color: #111; }
+  .metric-cell { border-right: 1px solid #eee; }
+  .floor-rule { background: #eee; }
+  .summary, .next-box, .panel.pay { border: 1px solid #ddd; background: #fafafa; }
+  .cards, .infra-cards { background: #eee; gap: 1px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOADER ═══════════════════════════════════════════════════════ -->
+<div id="loader">
+  <div class="mark" id="loader-mark"></div>
+  <div class="loading-text">Loading</div>
+</div>
+
+<!-- ═══ APP ══════════════════════════════════════════════════════════ -->
+<div id="app">
+  <header id="app-hdr"></header>
+  <main class="main" id="app-main"></main>
+</div>
+
+<!-- ═══ MODAL ════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="handleOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <span class="modal-title" id="m-title">Edit</span>
+      <button class="modal-x" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+    <div class="modal-footer">
+      <button class="btn danger" id="m-del" onclick="delModal()" style="display:none">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="json-in" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   CONFIGURATION — fill these in after Supabase setup
+   Access edit mode: yourdomain.com/?edit=YOUR_PASSPHRASE
+════════════════════════════════════════════════════════════════════ */
+const CFG = {
+  supabaseUrl: 'https://fjlrniqizvnowuwumbmj.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqbHJuaXFpenZub3d1d3VtYm1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5NzU2NTcsImV4cCI6MjA5MzU1MTY1N30.JJOoohr1GIHwgJZ-aiWDujyLpUtAbvdC6zjRxGaTgSE',
+  projectKey:  'chalet-k',                 // unique key for this project's data row
+  editPass:    'sk3d-edit-2026',           // change to something only you know
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   DEFAULT DATA
+════════════════════════════════════════════════════════════════════ */
+const DEFAULT_DATA = {
+  version: 3,
+  project: { name:'Chalet K', label:'SK3D · Chalet K · Megève', date:'May 2026' },
+  payment: { contract:73950, paidBefore:48067.5, invoice005:11092.5, finalBalance:14790 },
+  paymentNote: 'Étape 2 closed on payment of Invoice 005. The final phase (£14,790) is to be reconciled against remaining deliverables — primarily the bedroom package and final utility spaces — alongside any additional decision-support work agreed for the construction phase.',
+  pricing: [
+    {id:'p0', label:'PAC placement studies — new zone built + 3 option sets', count:9, rate:600},
+    {id:'p1', label:'Facade material iterations — multiple variants on completed scenes', count:13, rate:450},
+    {id:'p2', label:'Overdelivery — additional views beyond contracted count per space', count:16, rate:400},
+  ],
+  floors: [
+    {id:'sous-sol', name:'Sous-Sol', spaces:[
+      {id:'ss1',name:'Corridor & circulation',contracted:2,delivered:3,extra:0,status:'over',source:'Tracked: May #6 — exceeds contracted 2 views',note:''},
+      {id:'ss2',name:'Gym / Salle de sport',contracted:3,delivered:4,extra:0,status:'over',source:'Tracked: May #6 — exceeds contracted 3 views',note:''},
+      {id:'ss3',name:'Stair, lift & cellar zone',contracted:2,delivered:2,extra:0,status:'done',source:'Tracked: May #6 — complete',note:''},
+      {id:'ss4',name:'Cinema',contracted:2,delivered:1,extra:0,status:'partial',source:'Tracked: May #6 — 1 hero view; 1 further angle likely needed',note:''},
+      {id:'ss5',name:'Staff apartment',contracted:3,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'ss6',name:'Laundry / utility room',contracted:1,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'ss7',name:'PAC placement — all options',contracted:0,delivered:0,extra:9,status:'extra',source:'Additional decision-support work · new zone built + 9 tracked outputs across 3 placement options',note:''},
+    ]},
+    {id:'rez-inf', name:'Rez Inférieur', spaces:[
+      {id:'ri1',name:'Piscine / Spa / Sauna / Hammam',contracted:5,delivered:12,extra:0,status:'over',source:'Tracked: Feb #4 & #5 — 12 outputs vs 5 contracted',note:''},
+      {id:'ri2',name:'SDB 2 (bathroom)',contracted:3,delivered:3,extra:0,status:'done',source:'Tracked: Feb #4 — complete',note:''},
+      {id:'ri3',name:'Entrance hall',contracted:2,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'ri4',name:'Bedrooms (×3)',contracted:5,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'ri5',name:'Ski room',contracted:2,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'ri6',name:'Corridor / Guest WC',contracted:1,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+    ]},
+    {id:'rez-sup', name:'Rez Supérieur', spaces:[
+      {id:'rs1',name:'Salon / Dining / Billiard',contracted:5,delivered:4,extra:0,status:'partial',source:'Tracked: Feb #4 — living studies delivered; final hero selection pending',note:''},
+      {id:'rs2',name:'Cuisine (kitchen)',contracted:3,delivered:2,extra:0,status:'partial',source:'Tracked: Feb #4 — bar counter + island views',note:''},
+      {id:'rs3',name:'SDB 4 / Suite Parentale (bathroom)',contracted:3,delivered:3,extra:0,status:'done',source:'Tracked: Feb #4 — complete',note:''},
+      {id:'rs4',name:'Master bedroom',contracted:4,delivered:0,extra:0,status:'missing',source:'Bathroom complete; bedroom not yet tracked',note:''},
+      {id:'rs5',name:'Office / bureau',contracted:2,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+      {id:'rs6',name:'Pantry / Guest WC',contracted:1,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+    ]},
+    {id:'combles', name:'Combles', spaces:[
+      {id:'co1',name:'SDB 6 — Combles Sud',contracted:5,delivered:5,extra:0,status:'done',source:'Tracked: Feb #4 & #5 — complete',note:''},
+      {id:'co2',name:'Bedrooms (×3)',contracted:9,delivered:0,extra:0,status:'missing',source:'Bathrooms complete; bedroom scenes not yet tracked',note:''},
+      {id:'co3',name:'Circulation',contracted:1,delivered:0,extra:0,status:'missing',source:'Not yet tracked in any update PDF',note:''},
+    ]},
+    {id:'ext-c', name:'Extérieur — Contract Deliverables', spaces:[
+      {id:'ec1',name:'Rear facade — garden & pool terrace',contracted:3,delivered:4,extra:0,status:'over',source:'Tracked: OutD renders — multiple cameras, garden, sun loungers',note:''},
+      {id:'ec2',name:'Upper terrace / panorama view',contracted:1,delivered:1,extra:0,status:'done',source:'Tracked: UpViewTerrace — Megève panorama',note:''},
+      {id:'ec3',name:'Morning light exterior',contracted:1,delivered:1,extra:0,status:'done',source:'Tracked: MorningLight — soft sky, warm facade',note:''},
+      {id:'ec4',name:'Night exterior — front elevation',contracted:1,delivered:1,extra:0,status:'done',source:'Tracked: Feb #5 Lighting — atmospheric hero render',note:''},
+      {id:'ec5',name:'Front approach / driveway',contracted:3,delivered:2,extra:0,status:'partial',source:'Tracked: visible in PAC studies; final clean version may be needed',note:''},
+    ]},
+    {id:'ext-x', name:'Additional Decision-Support Work', spaces:[
+      {id:'ee1',name:'PAC option éventuelle — placement renders',contracted:0,delivered:0,extra:3,status:'extra',source:'Additional scope · to reconcile — 3 tracked outputs for this option',note:''},
+      {id:'ee2',name:'PAC option non-retenue (3 PACs)',contracted:0,delivered:0,extra:4,status:'extra',source:'Additional scope · to reconcile — 4 tracked outputs, multiple angles',note:''},
+      {id:'ee3',name:'PAC option retenue (1 PAC + Gaz)',contracted:0,delivered:0,extra:2,status:'extra',source:'Additional scope · to reconcile — 2 tracked outputs for selected option',note:''},
+      {id:'ee4',name:'Facade material iterations — 4+ variants',contracted:0,delivered:0,extra:13,status:'extra',source:'Additional scope · to reconcile — iterations on completed scenes × multiple cameras',note:''},
+    ]},
+  ],
+  infra: [
+    {id:'in1',name:'3ds Max scene build & cleanup',desc:'Full scene architecture built and maintained across all floor levels, with ongoing cleanup, organisation and file management throughout the project.',status:'Substantially complete',note:''},
+    {id:'in2',name:'Custom material library',desc:'Approx. 90% built by SK3D: reclaimed timber, stone, marble, glass, water, metal, and integrated lighting responses. Reusable across all current and future scenes.',status:'~90% complete · ongoing',note:''},
+    {id:'in3',name:'Lighting systems / look development',desc:'Architectural lighting developed per zone — day, dusk, and night. Includes interior accent, exterior facade/pathway lighting, and pool/spa atmosphere.',status:'Substantially complete',note:''},
+    {id:'in4',name:'Camera setup & scene knowledge',desc:'All camera positions, lenses, and framing developed and stored per space. Accumulated project knowledge means new areas render consistently and efficiently.',status:'Ongoing asset',note:''},
+    {id:'in5',name:'Meetings, coordination & design support',desc:'Coordination with family, builder, and économiste. Design explanation, material decision support, brief interpretation, and follow-up across the project lifecycle.',status:'Ongoing · to log',note:''},
+    {id:'in6',name:'Revision cycles',desc:'Multiple revision rounds across spa, bathrooms, exterior, heat pump placement, and material changes. Some exceeded the standard allowance; absorbed without separate billing.',status:'Absorbed · partially to reconcile',note:''},
+    {id:'in7',name:'PAC / technical decision-support modelling',desc:'Technical renders supporting the heat pump specification. Includes zone geometry build, 3 full option sets, and associated meeting and coordination time.',status:'Additional scope · to reconcile',note:''},
+  ],
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   SUPABASE LAYER
+════════════════════════════════════════════════════════════════════ */
+const DB = {
+  ok: () => !CFG.supabaseUrl.startsWith('YOUR'),
+  hdrs: () => ({ apikey: CFG.supabaseKey, Authorization: `Bearer ${CFG.supabaseKey}`, 'Content-Type': 'application/json' }),
+
+  async load() {
+    if (!this.ok()) return null;
+    try {
+      const r = await fetch(`${CFG.supabaseUrl}/rest/v1/tracker_data?project_key=eq.${CFG.projectKey}&select=data&limit=1`, { headers: this.hdrs() });
+      const rows = await r.json();
+      return rows[0]?.data || null;
+    } catch { return null; }
+  },
+
+  async save(data) {
+    if (!this.ok()) return false;
+    try {
+      const r = await fetch(`${CFG.supabaseUrl}/rest/v1/tracker_data`, {
+        method: 'POST',
+        headers: { ...this.hdrs(), Prefer: 'resolution=merge-duplicates' },
+        body: JSON.stringify({ project_key: CFG.projectKey, data, updated_at: new Date().toISOString() }),
+      });
+      return r.ok;
+    } catch { return false; }
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════════ */
+let D;         // appData
+let editMode = false;
+let syncStatus = 'local';   // local | saved | saving | error
+let curFilter  = 'all';
+let pricingOpen = false;
+let payOpen = false;
+let curEdit = null;
+let saveTimer = null;
+let dragState = null; // { floorId, spaceId }
+
+const STATUS_CFG = {
+  done:    { cls:'sp-done',    label:'Delivered',       bar:'bar-done',    card:'st-done',    pct:()=>100 },
+  over:    { cls:'sp-over',    label:'Overdelivered',   bar:'bar-over',    card:'st-over',    pct:()=>100 },
+  partial: { cls:'sp-partial', label:'Partial',         bar:'bar-partial', card:'st-partial', pct:(d,c)=>c>0?Math.round(d/c*100):50 },
+  missing: { cls:'sp-missing', label:'To complete',     bar:'bar-missing', card:'st-missing', pct:()=>0 },
+  extra:   { cls:'sp-extra',   label:'Additional scope',bar:'bar-extra',   card:'st-extra',   pct:()=>100 },
+};
+const STATUS_OPTS = ['done','over','partial','missing','extra'];
+
+/* ═══════════════════════════════════════════════════════════════════
+   BRAND MARK SVG
+════════════════════════════════════════════════════════════════════ */
+function mark(sz=18, col='var(--gold)') {
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="10" y1="1.5" x2="10" y2="18.5" stroke="${col}" stroke-width="0.9"/>
+    <line x1="1.5" y1="10" x2="18.5" y2="10" stroke="${col}" stroke-width="0.9"/>
+    <line x1="3.5" y1="3.5" x2="16.5" y2="16.5" stroke="${col}" stroke-width="0.9"/>
+    <line x1="16.5" y1="3.5" x2="3.5" y2="16.5" stroke="${col}" stroke-width="0.9"/>
+    <circle cx="10" cy="1.5" r="1.3" fill="${col}"/>
+    <circle cx="10" cy="18.5" r="1.3" fill="${col}"/>
+    <circle cx="1.5" cy="10" r="1.3" fill="${col}"/>
+    <circle cx="18.5" cy="10" r="1.3" fill="${col}"/>
+    <circle cx="3.5" cy="3.5" r="1.3" fill="${col}"/>
+    <circle cx="16.5" cy="16.5" r="1.3" fill="${col}"/>
+    <circle cx="16.5" cy="3.5" r="1.3" fill="${col}"/>
+    <circle cx="3.5" cy="16.5" r="1.3" fill="${col}"/>
+  </svg>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   METRICS
+════════════════════════════════════════════════════════════════════ */
+function calcM() {
+  let contracted=0, delivered=0, overCount=0, extraCount=0, missingCount=0;
+  D.floors.forEach(fl => fl.spaces.forEach(sp => {
+    if (sp.status !== 'extra') {
+      contracted += sp.contracted; delivered += sp.delivered;
+      if (sp.status==='over') overCount += (sp.delivered - sp.contracted);
+      if (sp.status==='missing') missingCount++;
+    } else {
+      extraCount += sp.extra;
+    }
+  }));
+  const pTotal = D.pricing.reduce((a,p) => a + (p.count * p.rate), 0);
+  const paidAfter = D.payment.paidBefore + D.payment.invoice005;
+  const pct = D.payment.contract > 0 ? Math.round(paidAfter / D.payment.contract * 100) : 0;
+  return { contracted, delivered, overCount, extraCount, missingCount, pTotal, paidAfter, pct };
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SYNC STATUS
+════════════════════════════════════════════════════════════════════ */
+function setSyncStatus(s) {
+  syncStatus = s;
+  const el = document.getElementById('sync-dot');
+  if (!el) return;
+  el.className = `sync-dot ${s}`;
+  const labels = { local:'Local only', saved:'Synced', saving:'Saving…', error:'Sync error', loading:'Loading…' };
+  el.textContent = labels[s] || s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAVE
+════════════════════════════════════════════════════════════════════ */
+function scheduleSave() {
+  localStorage.setItem('ck_tracker_v3', JSON.stringify(D));
+  clearTimeout(saveTimer);
+  setSyncStatus('saving');
+  saveTimer = setTimeout(async () => {
+    if (DB.ok()) {
+      const ok = await DB.save(D);
+      setSyncStatus(ok ? 'saved' : 'error');
+    } else {
+      setSyncStatus('local');
+    }
+  }, 800);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: HEADER
+════════════════════════════════════════════════════════════════════ */
+function renderHdr() {
+  const m = calcM();
+  const syncLabel = {local:'Local only',saved:'Synced',saving:'Saving…',error:'Sync error',loading:'Loading…'}[syncStatus]||syncStatus;
+  const internalActions = editMode ? '' : `
+    <button class="btn internal ${pricingOpen?'price-on':''}" onclick="togglePricing()">Scope valuation</button>`;
+
+  document.getElementById('app-hdr').innerHTML = `
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-brand">
+        ${mark(14)} <span>Khoury Design</span>
+        <span class="divider">·</span>
+        <span class="project">${esc(D.project.name)}</span>
+      </div>
+      <div class="hdr-badges">
+        ${editMode ? '<span class="mode-badge edit">Edit Mode</span>' : ''}
+        ${!editMode && !DB.ok() ? '' : `<span class="sync-dot ${syncStatus}" id="sync-dot">${syncLabel}</span>`}
+      </div>
+      <div class="hdr-actions">
+        <button class="btn ${editMode?'edit-on':''}" onclick="toggleEdit()">${editMode?'✓ Done editing':'Edit'}</button>
+        <button class="btn ${payOpen?'pay-on':''}" onclick="togglePay()">£ Payment</button>
+        ${internalActions}
+        <button class="btn" onclick="window.print()">Print</button>
+        <button class="btn" onclick="exportCSV()">CSV</button>
+        <button class="btn internal" onclick="exportJSON()">Export JSON</button>
+        <button class="btn internal" onclick="document.getElementById('json-in').click()">Import JSON</button>
+      </div>
+    </div>
+
+    <div class="hdr-identity">
+      <div class="hdr-title-block">
+        <div class="hdr-eyebrow">Scope &amp; Reconciliation</div>
+        <div class="hdr-title">Chalet K <em>Tracker</em></div>
+      </div>
+    </div>
+
+    <div class="metrics-strip">
+      <div class="metric-cell">
+        <div class="metric-num gold">${m.delivered} <span style="font-size:20px;color:var(--dust)">/ ${m.contracted}</span></div>
+        <div class="metric-label">Renders tracked</div>
+        <div class="metric-sub">of contracted scope</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num green">+${m.overCount}</div>
+        <div class="metric-label">Overdelivered</div>
+        <div class="metric-sub">above contracted counts</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num">${m.extraCount}</div>
+        <div class="metric-label">Additional studies</div>
+        <div class="metric-sub">PAC + material iterations</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num">${m.missingCount}</div>
+        <div class="metric-label">Spaces to complete</div>
+        <div class="metric-sub">primarily bedrooms</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num small">Substantially<br>built</div>
+        <div class="metric-label">Scene infrastructure</div>
+        <div class="metric-sub">3ds Max · materials · cameras</div>
+      </div>
+      <div class="metric-cell internal">
+        <div class="metric-num gold">${pricingOpen ? '£'+m.pTotal.toLocaleString() : '—'}</div>
+        <div class="metric-label">Additional scope value</div>
+        <div class="metric-sub">${pricingOpen ? 'at current rates' : 'open scope valuation'}</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-num gold">${m.pct}%</div>
+        <div class="metric-label">After Invoice 005</div>
+        <div class="metric-sub">£${D.payment.finalBalance.toLocaleString()} final balance</div>
+      </div>
+    </div>
+  </div>`;
+
+  applyModes();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: MAIN
+════════════════════════════════════════════════════════════════════ */
+function renderMain() {
+  const m = calcM();
+  let html = '';
+
+  /* Payment panel */
+  if (payOpen) html += renderPay();
+
+  /* Pricing panel */
+  if (pricingOpen) html += renderPricing(m);
+
+  /* Filter bar */
+  const fltrs = [
+    {k:'all',l:'All spaces',c:''},
+    {k:'done',l:'Delivered',c:'fd'},
+    {k:'over',l:'Overdelivered',c:'fo'},
+    {k:'partial',l:'Partial',c:'fp'},
+    {k:'missing',l:'To complete',c:'fm'},
+    {k:'extra',l:'Additional',c:'fe'},
+  ];
+  html += `<div class="filter-bar"><span class="filter-lbl">Filter</span>`;
+  fltrs.forEach(f => { html += `<button class="fbtn ${f.c} ${curFilter===f.k?'on':''}" onclick="setF('${f.k}')">${f.l}</button>`; });
+  html += `</div>`;
+
+  /* Legend */
+  html += `<div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--g)"></div>Delivered</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--ov)"></div>Overdelivered</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--am)"></div>Partial</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--rd)"></div>To complete</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--bl)"></div>Additional studies</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--tl)"></div>Infrastructure</div>
+  </div>`;
+
+  /* Floors */
+  D.floors.forEach(fl => { html += renderFloor(fl); });
+
+  /* Add floor */
+  html += `<div class="add-section"><button class="btn ghost edit-only" onclick="openAddFloor()">+ Add floor / section</button></div>`;
+
+  /* Infrastructure */
+  const showInfra = curFilter === 'all' || curFilter === 'extra';
+  html += `<div class="section-gap" ${showInfra?'':'style="display:none"'}>
+    <div class="floor-hdr">
+      <div class="floor-name">Production Infrastructure &amp; Hidden Work</div>
+      <div class="floor-rule"></div>
+      <div class="floor-tally">Value delivered beyond render count</div>
+      <div class="floor-acts edit-show">
+        <button class="btn ghost" style="font-size:9px;padding:3px 10px" onclick="openAddInfra()">+ Add item</button>
+      </div>
+    </div>
+    <div class="infra-cards">`;
+  D.infra.forEach(item => { html += renderInfraCard(item); });
+  html += `</div></div>`;
+
+  /* Summary */
+  html += `<div class="summary internal">
+    <div class="summary-label">Reconciliation summary · ${esc(D.project.date)}</div>
+    <div class="summary-text">
+      <strong>${m.delivered} contract renders tracked</strong> across all updates and additional exterior files. The pool/spa package delivered 12 against a contracted 5 — the single largest overdelivery on the project. Exterior is substantially complete: rear facade, garden, terrace, morning light, and night elevation all tracked across multiple cameras. <span class="highlight">${m.extraCount} additional outputs sit outside the original render-count structure</span> — PAC placement studies and facade material iterations. <strong>Remaining to complete: approximately ${Math.max(0,m.contracted-m.delivered)} renders</strong> — primarily the bedroom package across Combles, Rez Supérieur master, and Rez Inférieur, plus entrance hall and ski room.<br><br>
+      In addition to the visible render outputs, a substantial part of the value delivered sits in the production infrastructure: the 3ds Max scene build, custom material library, lighting systems, cameras, revision history, and accumulated project knowledge that now allow new areas to be rendered much faster and more consistently.
+    </div>
+  </div>`;
+
+  /* Next step */
+  html += `<div class="next-box internal">
+    <div class="next-label">Next step</div>
+    <div class="next-text">
+      <strong>Invoice 005 sent for Étape 2B.</strong> After payment clears, reconcile remaining scope: final bedroom package (Combles ×3, master suite, Rez Inférieur ×3), entrance hall, ski room, and utility areas. Agree final exterior cleanup. Open the construction-phase retainer conversation before the final £${D.payment.finalBalance.toLocaleString()} payment.
+    </div>
+  </div>`;
+
+  document.getElementById('app-main').innerHTML = html;
+  applyModes();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: FLOOR
+════════════════════════════════════════════════════════════════════ */
+function renderFloor(fl) {
+  const show = curFilter==='all' ? fl.spaces : fl.spaces.filter(s=>s.status===curFilter);
+  const cr = fl.spaces.filter(s=>s.status!=='extra').reduce((a,s)=>a+s.contracted,0);
+  const dr = fl.spaces.filter(s=>s.status!=='extra').reduce((a,s)=>a+s.delivered,0);
+  const er = fl.spaces.filter(s=>s.status==='extra').reduce((a,s)=>a+s.extra,0);
+  let tally = `${dr} / ${cr} tracked`;
+  if (er>0) tally += ` · ${er} additional`;
+  const hide = show.length===0 ? 'style="display:none"' : '';
+  const dropZ = editMode
+    ? 'ondragover="dragOver(\'' + fl.id + '\',event)" ondrop="cardDrop(\'' + fl.id + '\',event)" ondragleave="dragLeave(event)"'
+    : '';
+  return `<div class="section-gap" ${hide}>
+    <div class="floor-hdr">
+      <div class="floor-name">${esc(fl.name)}</div>
+      <div class="floor-rule"></div>
+      <div class="floor-tally">${tally}</div>
+      <div class="floor-acts edit-show">
+        <button class="btn ghost" style="font-size:9px;padding:3px 10px" onclick="openAddSpace('${fl.id}')">+ Add space</button>
+        <button class="btn ghost" style="font-size:9px;padding:3px 10px" onclick="openEditFloor('${fl.id}')">Edit</button>
+      </div>
+    </div>
+    <div class="cards" ${dropZ}>${show.map(sp=>renderCard(fl.id,sp)).join('')}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: CARD
+════════════════════════════════════════════════════════════════════ */
+function renderCard(floorId, sp) {
+  const cfg = STATUS_CFG[sp.status] || STATUS_CFG.missing;
+  const isEx = sp.status==='extra';
+  const num = isEx ? sp.extra : sp.delivered;
+  const pct = Math.min(cfg.pct(sp.delivered, sp.contracted), 100);
+  const nk = `ck3_${floorId}_${sp.id}`;
+  const nv = esc(sp.note||'');
+
+  let vsHtml = '';
+  if (!isEx && sp.contracted>0) {
+    const diff = sp.delivered - sp.contracted;
+    if (sp.delivered===0) vsHtml=`<span class="vs-tag vs-under">${sp.contracted} to deliver</span>`;
+    else if (diff>0) vsHtml=`<span class="vs-text">of ${sp.contracted}</span><span class="vs-tag vs-over">+${diff} over</span>`;
+    else if (diff<0) vsHtml=`<span class="vs-text">of ${sp.contracted}</span><span class="vs-tag vs-under">${diff} remaining</span>`;
+    else vsHtml=`<span class="vs-text">of ${sp.contracted}</span><span class="vs-tag vs-exact">exact</span>`;
+    vsHtml=`<div class="card-vs">${vsHtml}</div>`;
+  } else if (isEx) {
+    vsHtml=`<div class="card-vs"><span class="vs-recon">additional scope · to reconcile</span></div>`;
+  }
+
+  const dragA = editMode
+    ? 'draggable="true" ondragstart="dragStart(\'' + floorId + '\',\'' + sp.id + '\',event)"'
+    : '';
+  return `<div class="card ${cfg.card}" ${dragA}>
+    <div class="card-hdr">
+      <div class="card-name">${esc(sp.name)}</div>
+      <button class="card-edit-btn" onclick="openEditSpace('${floorId}','${sp.id}')">Edit</button>
+    </div>
+    <div class="status-pill ${cfg.cls}"><div class="dot"></div>${cfg.label}</div>
+    <div>
+      <span class="card-num ${num===0?'zero':''}">${num}</span><span class="card-unit">render${num!==1?'s':''}</span>
+      ${vsHtml}
+    </div>
+    <div class="card-bar"><div class="card-bar-fill ${cfg.bar}" style="width:${pct}%"></div></div>
+    <div class="card-src">${esc(sp.source)}</div>
+    <div class="card-note-wrap">
+      <input class="card-note" type="text" placeholder="Add note…" value="${nv}" oninput="updateNote('${floorId}','${sp.id}',this.value)">
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: INFRA CARD
+════════════════════════════════════════════════════════════════════ */
+function renderInfraCard(item) {
+  const nv = esc(item.note||'');
+  return `<div class="infra-card">
+    <div class="infra-card-hdr">
+      <div class="infra-card-name">${esc(item.name)}</div>
+      <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+        <span class="infra-badge">Infrastructure</span>
+        <button class="infra-edit-btn" onclick="openEditInfra('${item.id}')">Edit</button>
+      </div>
+    </div>
+    <div class="infra-desc">${esc(item.desc)}</div>
+    <div class="infra-status">${esc(item.status)}</div>
+    <div class="card-note-wrap">
+      <input class="card-note" type="text" placeholder="Add note…" value="${nv}" oninput="updateInfraNote('${item.id}',this.value)">
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: PAYMENT PANEL
+════════════════════════════════════════════════════════════════════ */
+function renderPay() {
+  const p = D.payment;
+  const paidAfter = p.paidBefore + p.invoice005;
+  const fld = (id,val,cls='') => editMode
+    ? `<input class="pay-input" type="number" step="0.01" value="${val}" oninput="updatePay('${id}',this.value)">`
+    : `<div class="pay-cell-val ${cls}">£${Number(val).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>`;
+  return `<div class="panel pay">
+    <div class="panel-label">Payment position</div>
+    <div class="pay-cells">
+      <div class="pay-cell"><div class="pay-cell-label">Original contract</div>${fld('contract',p.contract)}</div>
+      <div class="pay-cell"><div class="pay-cell-label">Paid before Invoice 005</div>${fld('paidBefore',p.paidBefore)}</div>
+      <div class="pay-cell"><div class="pay-cell-label">Invoice 005 · Étape 2B</div>${fld('invoice005',p.invoice005,'gold')}</div>
+      <div class="pay-cell"><div class="pay-cell-label">Total paid after Inv. 005</div><div class="pay-cell-val green">£${paidAfter.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+      <div class="pay-cell"><div class="pay-cell-label">Final balance</div>${fld('finalBalance',p.finalBalance,'gold')}</div>
+    </div>
+    <div class="pay-note internal"><strong>Position:</strong> ${esc(D.paymentNote)}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER: PRICING PANEL
+════════════════════════════════════════════════════════════════════ */
+function renderPricing(m) {
+  let rows = '';
+  D.pricing.forEach((p,i) => {
+    const sub = p.count * p.rate;
+    rows += `<tr>
+      <td class="cat">${esc(p.label)}</td>
+      <td><div class="rate-wrap"><input class="cnt-in" type="number" min="0" value="${p.count}" oninput="updateP(${i},'count',this.value)"></div></td>
+      <td><div class="rate-wrap"><input class="rate-in" type="number" min="0" step="50" value="${p.rate}" oninput="updateP(${i},'rate',this.value)"> £</div></td>
+      <td>£${sub.toLocaleString()}</td>
+    </tr>`;
+  });
+  return `<div class="panel price internal">
+    <div class="panel-label">Additional Scope Valuation — internal estimate</div>
+    <div class="panel-internal-note">For internal reconciliation only. These figures are a framework for discussion, not a formal invoice demand.</div>
+    <table class="price-tbl">
+      <thead><tr><th>Category</th><th style="text-align:right">Count</th><th style="text-align:right">Rate / render</th><th style="text-align:right">Indicative value</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="price-footer">
+      <div class="price-footer-note">
+        <strong>Indicative total at current rates.</strong> This work sits outside the clean original render-count structure of the contract. These figures can support a clearer construction-phase retainer or final reconciliation conversation.
+      </div>
+      <div class="price-total" id="p-total">£${m.pTotal.toLocaleString()}</div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FULL RENDER
+════════════════════════════════════════════════════════════════════ */
+function render() { renderHdr(); renderMain(); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODES
+════════════════════════════════════════════════════════════════════ */
+function applyModes() {
+  document.body.classList.toggle('edit-mode', editMode);
+  document.body.classList.toggle('client-mode', !editMode);
+}
+function toggleEdit() { editMode = !editMode; render(); }
+function togglePay() { payOpen = !payOpen; render(); }
+function togglePricing() { pricingOpen = !pricingOpen; render(); }
+function setF(f) { curFilter = f; render(); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIVE UPDATES (no full re-render for inline edits)
+════════════════════════════════════════════════════════════════════ */
+function updateNote(fid, sid, val) {
+  const fl = D.floors.find(f=>f.id===fid); if(!fl) return;
+  const sp = fl.spaces.find(s=>s.id===sid); if(sp) { sp.note=val; scheduleSave(); }
+}
+function updateInfraNote(iid, val) {
+  const it = D.infra.find(i=>i.id===iid); if(it) { it.note=val; scheduleSave(); }
+}
+function updatePay(field, val) {
+  D.payment[field] = parseFloat(val)||0;
+  scheduleSave();
+  renderHdr();
+}
+function updateP(idx, field, val) {
+  D.pricing[idx][field] = field==='rate' ? (parseFloat(val)||0) : (parseInt(val)||0);
+  scheduleSave();
+  const m = calcM();
+  const el = document.getElementById('p-total');
+  if (el) el.textContent = '£'+m.pTotal.toLocaleString();
+  renderHdr();
+  const rows = document.querySelectorAll('.price-tbl tbody tr');
+  rows.forEach((row,i) => { row.cells[3].textContent = '£'+(D.pricing[i].count*D.pricing[i].rate).toLocaleString(); });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════════════════════════════ */
+function openModal(title, body, showDel) {
+  document.getElementById('m-title').textContent = title;
+  document.getElementById('m-body').innerHTML = body;
+  document.getElementById('m-del').style.display = showDel ? 'block' : 'none';
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; curEdit = null; }
+function handleOverlay(e) { if(e.target===document.getElementById('modal')) closeModal(); }
+
+function selOpts(sel) {
+  return STATUS_OPTS.map(s => `<option value="${s}" ${s===sel?'selected':''}>${STATUS_CFG[s].label}</option>`).join('');
+}
+
+function openEditSpace(fid, sid) {
+  const fl = D.floors.find(f=>f.id===fid);
+  const sp = fl&&fl.spaces.find(s=>s.id===sid);
+  if (!sp) return;
+  curEdit = {type:'space', fid, sid};
+  openModal('Edit space', `
+    <div class="form-group"><label class="form-label">Name</label><input class="form-in" id="f-name" value="${esc(sp.name)}"></div>
+    <div class="form-group"><label class="form-label">Status</label><select class="form-in" id="f-status">${selOpts(sp.status)}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Contracted</label><input class="form-in" id="f-c" type="number" min="0" value="${sp.contracted}"><div class="form-hint">Agreed renders</div></div>
+      <div class="form-group"><label class="form-label">Delivered</label><input class="form-in" id="f-d" type="number" min="0" value="${sp.delivered}"><div class="form-hint">Tracked outputs</div></div>
+      <div class="form-group"><label class="form-label">Extra</label><input class="form-in" id="f-e" type="number" min="0" value="${sp.extra}"><div class="form-hint">Additional scope</div></div>
+    </div>
+    <div class="form-group"><label class="form-label">Source note</label><textarea class="form-in" id="f-src">${esc(sp.source)}</textarea></div>
+    <div class="form-group"><label class="form-label">Internal note</label><input class="form-in" id="f-note" value="${esc(sp.note||'')}"></div>
+  `, true);
+}
+
+function openAddSpace(fid) {
+  curEdit = {type:'space-new', fid};
+  openModal('Add space', `
+    <div class="form-group"><label class="form-label">Name</label><input class="form-in" id="f-name" placeholder="e.g. Master bedroom"></div>
+    <div class="form-group"><label class="form-label">Status</label><select class="form-in" id="f-status">${selOpts('missing')}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Contracted</label><input class="form-in" id="f-c" type="number" min="0" value="0"></div>
+      <div class="form-group"><label class="form-label">Delivered</label><input class="form-in" id="f-d" type="number" min="0" value="0"></div>
+      <div class="form-group"><label class="form-label">Extra</label><input class="form-in" id="f-e" type="number" min="0" value="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Source note</label><textarea class="form-in" id="f-src" placeholder="Tracking notes…"></textarea></div>
+    <div class="form-group"><label class="form-label">Internal note</label><input class="form-in" id="f-note"></div>
+  `, false);
+}
+
+function openEditFloor(fid) {
+  const fl = D.floors.find(f=>f.id===fid); if(!fl) return;
+  curEdit = {type:'floor', fid};
+  openModal('Edit floor', `<div class="form-group"><label class="form-label">Section name</label><input class="form-in" id="f-fname" value="${esc(fl.name)}"></div>`, true);
+}
+
+function openAddFloor() {
+  curEdit = {type:'floor-new'};
+  openModal('Add section', `<div class="form-group"><label class="form-label">Section name</label><input class="form-in" id="f-fname" placeholder="e.g. Rez Supérieur"></div>`, false);
+}
+
+function openEditInfra(iid) {
+  const it = D.infra.find(i=>i.id===iid); if(!it) return;
+  curEdit = {type:'infra', iid};
+  openModal('Edit infrastructure item', `
+    <div class="form-group"><label class="form-label">Name</label><input class="form-in" id="f-iname" value="${esc(it.name)}"></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-in" id="f-idesc">${esc(it.desc)}</textarea></div>
+    <div class="form-group"><label class="form-label">Status</label><input class="form-in" id="f-istatus" value="${esc(it.status)}"></div>
+    <div class="form-group"><label class="form-label">Internal note</label><input class="form-in" id="f-inote" value="${esc(it.note||'')}"></div>
+  `, true);
+}
+
+function openAddInfra() {
+  curEdit = {type:'infra-new'};
+  openModal('Add infrastructure item', `
+    <div class="form-group"><label class="form-label">Name</label><input class="form-in" id="f-iname"></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-in" id="f-idesc"></textarea></div>
+    <div class="form-group"><label class="form-label">Status</label><input class="form-in" id="f-istatus"></div>
+    <div class="form-group"><label class="form-label">Internal note</label><input class="form-in" id="f-inote"></div>
+  `, false);
+}
+
+function saveModal() {
+  const ce = curEdit; if(!ce) { closeModal(); return; }
+  const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+  if (ce.type==='space'||ce.type==='space-new') {
+    const sp = {
+      id: ce.type==='space-new' ? uid() : ce.sid,
+      name: document.getElementById('f-name').value.trim()||'Unnamed',
+      contracted: Math.max(0,parseInt(document.getElementById('f-c').value)||0),
+      delivered:  Math.max(0,parseInt(document.getElementById('f-d').value)||0),
+      extra:      Math.max(0,parseInt(document.getElementById('f-e').value)||0),
+      status:     document.getElementById('f-status').value,
+      source:     document.getElementById('f-src').value.trim(),
+      note:       document.getElementById('f-note').value.trim(),
+    };
+    const fl = D.floors.find(f=>f.id===ce.fid);
+    if (fl) {
+      if (ce.type==='space-new') fl.spaces.push(sp);
+      else { const i=fl.spaces.findIndex(s=>s.id===ce.sid); if(i>=0) fl.spaces[i]=sp; }
+    }
+  } else if (ce.type==='floor'||ce.type==='floor-new') {
+    const name = document.getElementById('f-fname').value.trim()||'New section';
+    if (ce.type==='floor-new') D.floors.push({id:uid(),name,spaces:[]});
+    else { const fl=D.floors.find(f=>f.id===ce.fid); if(fl) fl.name=name; }
+  } else if (ce.type==='infra'||ce.type==='infra-new') {
+    const it = {
+      id: ce.type==='infra-new' ? uid() : ce.iid,
+      name:   document.getElementById('f-iname').value.trim()||'Unnamed',
+      desc:   document.getElementById('f-idesc').value.trim(),
+      status: document.getElementById('f-istatus').value.trim(),
+      note:   document.getElementById('f-inote').value.trim(),
+    };
+    if (ce.type==='infra-new') D.infra.push(it);
+    else { const i=D.infra.findIndex(x=>x.id===ce.iid); if(i>=0) D.infra[i]=it; }
+  }
+
+  scheduleSave(); closeModal(); render();
+}
+
+function delModal() {
+  const ce = curEdit; if(!ce) return;
+  if (!confirm('Delete this item? Cannot be undone.')) return;
+  if (ce.type==='space') { const fl=D.floors.find(f=>f.id===ce.fid); if(fl) fl.spaces=fl.spaces.filter(s=>s.id!==ce.sid); }
+  else if (ce.type==='floor') { if(D.floors.length<=1){alert('Cannot delete the last section.');return;} D.floors=D.floors.filter(f=>f.id!==ce.fid); }
+  else if (ce.type==='infra') { D.infra=D.infra.filter(i=>i.id!==ce.iid); }
+  scheduleSave(); closeModal(); render();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DRAG & DROP — move cards between sections
+════════════════════════════════════════════════════════════════════ */
+function dragStart(floorId, spaceId, e) {
+  if (!editMode) { e.preventDefault(); return; }
+  dragState = { floorId, spaceId };
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', `${floorId}::${spaceId}`);
+  // Delay so the original card still renders under the ghost
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`.card[ondragstart*="${spaceId}"]`);
+    if (el) el.classList.add('dragging');
+  });
+}
+
+function dragOver(targetFloorId, e) {
+  if (!dragState || dragState.floorId === targetFloorId) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+
+function cardDrop(targetFloorId, e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragState) return;
+  const { floorId: srcId, spaceId } = dragState;
+  dragState = null;
+  if (srcId === targetFloorId) return;
+  const src = D.floors.find(f => f.id === srcId);
+  const tgt = D.floors.find(f => f.id === targetFloorId);
+  if (!src || !tgt) return;
+  const idx = src.spaces.findIndex(s => s.id === spaceId);
+  if (idx < 0) return;
+  const [space] = src.spaces.splice(idx, 1);
+  tgt.spaces.push(space);
+  scheduleSave();
+  render();
+}
+
+// Clean up if dropped outside any zone
+document.addEventListener('dragend', () => {
+  dragState = null;
+  document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+});
+
+function exportJSON() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));
+  a.download = `Chalet_K_Tracker_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function handleImport(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const p = JSON.parse(ev.target.result);
+      if (!p.floors||!p.payment) throw new Error('Invalid format');
+      D = p; scheduleSave(); render(); alert('Imported successfully.');
+    } catch(err) { alert('Import failed: '+err.message); }
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
+function exportCSV() {
+  const rows=[['Floor','Space','Status','Contracted','Delivered','Extra','Overdelivery','Source','Note']];
+  D.floors.forEach(fl => fl.spaces.forEach(sp => {
+    const ov=sp.status==='over'?Math.max(0,sp.delivered-sp.contracted):0;
+    rows.push([fl.name,sp.name,sp.status,sp.contracted,sp.status==='extra'?0:sp.delivered,sp.status==='extra'?sp.extra:0,ov,sp.source,sp.note||'']);
+  }));
+  D.infra.forEach(it => rows.push(['Infrastructure',it.name,'infrastructure','','','','',it.status,it.note||'']));
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='Chalet_K_Scope_Reconciliation.csv';
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════════════════════════════ */
+function esc(s) {
+  if (s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════════ */
+async function init() {
+  /* Detect mode from URL */
+  const p = new URLSearchParams(window.location.search);
+  editMode = p.get('edit') === CFG.editPass;
+
+  /* Show loader mark */
+  document.getElementById('loader-mark').innerHTML = mark(42);
+
+  /* Load data */
+  setSyncStatus('loading');
+  let loaded = false;
+
+  if (DB.ok()) {
+    try {
+      const cloud = await DB.load();
+      if (cloud) { D = cloud; setSyncStatus('saved'); loaded = true; }
+    } catch {}
+  }
+
+  if (!loaded) {
+    const local = localStorage.getItem('ck_tracker_v3');
+    D = local ? JSON.parse(local) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+    if (DB.ok()) {
+      setSyncStatus('saving');
+      DB.save(D).then(ok => setSyncStatus(ok ? 'saved' : 'error'));
+    } else {
+      setSyncStatus('local');
+    }
+  }
+
+  /* Render */
+  render();
+
+  /* Show app */
+  const loader = document.getElementById('loader');
+  const app = document.getElementById('app');
+  setTimeout(() => {
+    loader.classList.add('hidden');
+    app.classList.add('ready');
+  }, 400);
+}
+
+init();
+</script>
+</body>
+</html>
